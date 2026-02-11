@@ -13,12 +13,10 @@
 
 @layer base {
   body {
-    @apply bg-[#050a1a] text-white overflow-hidden;
+    @apply bg-[#050a1a] text-white;
     /* Deep space radial gradient */
     background: radial-gradient(circle at center, #0a1128 0%, #050a1a 100%);
     margin: 0;
-    display: flex;
-    place-items: center;
     min-width: 320px;
     min-height: 100vh;
   }

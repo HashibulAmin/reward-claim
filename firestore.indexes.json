@@ -1,0 +1,19 @@
+{
+    "indexes": [
+        {
+            "collectionGroup": "claims",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "ownerEmail",
+                    "order": "ASCENDING"
+                },
+                {
+                    "fieldPath": "claimedAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        }
+    ],
+    "fieldOverrides": []
+}

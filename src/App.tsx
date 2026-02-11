@@ -1,35 +1,111 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import { GiftAnimation } from './components/animations/GiftAnimation';
+import { BalloonAnimation } from './components/animations/BalloonAnimation';
+import { KittyAnimation } from './components/animations/KittyAnimation';
+import { AnimatedButton } from './components/common/AnimatedButton';
+import { ClaimForm } from './components/claim/ClaimForm';
+import { SuccessScreen } from './components/claim/SuccessScreen';
+import { type ClaimFormData } from './lib/validation';
+import { Toaster } from 'react-hot-toast';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [view, setView] = useState<'landing' | 'form' | 'success'>('landing');
+  const [claimData, setClaimData] = useState<ClaimFormData | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const startClaim = () => setView('form');
+
+  const handleClaimSubmit = async (data: ClaimFormData) => {
+    setLoading(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    setLoading(false);
+    setClaimData(data);
+    setView('success');
+  };
+
+  const resetFlow = () => {
+    setView('landing');
+    setClaimData(null);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="relative min-h-screen text-white selection:bg-purple-500/30">
+      <BalloonAnimation count={15} />
+      <Toaster position="top-center" />
+
+      <AnimatePresence mode="wait">
+        {view === 'landing' && (
+          <motion.div 
+            key="landing"
+            className="relative z-10 container mx-auto px-4 flex flex-col items-center justify-center min-h-screen gap-12"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h1 className="text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 animate-pulse-slow text-center drop-shadow-lg">
+              You've Won a Gift!
+            </h1>
+            
+            <div className="glass-panel p-12 flex flex-col items-center gap-8 animate-drift transform hover:scale-[1.02] transition-transform duration-500">
+              <GiftAnimation size={250} />
+              <div className="text-center space-y-2">
+                <p className="text-xl text-gray-300">Open your surprise now</p>
+                <p className="text-sm text-gray-500">Valid until tomorrow</p>
+              </div>
+              <AnimatedButton 
+                text="Claim Reward" 
+                onClick={startClaim} 
+                className="text-lg w-full max-w-xs"
+              />
+            </div>
+          </motion.div>
+        )}
+
+        {view === 'form' && (
+          <motion.div 
+            key="form"
+            className="relative z-10 container mx-auto px-4 py-8 md:py-16 flex flex-col items-center min-h-screen"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="glass-panel w-full max-w-2xl p-8 md:p-12 mt-10">
+              <h2 className="text-3xl font-bold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">
+                Claim Details
+              </h2>
+              <ClaimForm onSubmit={handleClaimSubmit} isLoading={loading} />
+              <button 
+                onClick={() => setView('landing')}
+                className="w-full mt-6 text-gray-500 hover:text-white transition-colors text-sm"
+              >
+                Cancel and go back
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {view === 'success' && claimData && (
+          <SuccessScreen 
+            userName={claimData.userName}
+            pickupDetails={{
+              location: claimData.pickupLocation,
+              date: claimData.pickupDate,
+              timeSlotId: claimData.pickupTimeSlot
+            }}
+            onClose={resetFlow}
+          />
+        )}
+      </AnimatePresence>
+
+      <KittyAnimation />
+    </div>
+  );
 }
 
-export default App
+export default App;
