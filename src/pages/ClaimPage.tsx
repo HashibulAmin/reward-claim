@@ -9,22 +9,30 @@ import { ClaimForm } from '../components/claim/ClaimForm';
 import { SuccessScreen } from '../components/claim/SuccessScreen';
 import { type ClaimFormData } from '../lib/validation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useClaimSubmit } from '../hooks/useClaimSubmit';
+import toast from 'react-hot-toast';
 
 export const ClaimPage: React.FC = () => {
   const { linkId } = useParams<{ linkId?: string }>();
   const [view, setView] = useState<'landing' | 'form' | 'success'>('landing');
   const [claimData, setClaimData] = useState<ClaimFormData | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { submitClaim, isLoading, error } = useClaimSubmit();
 
   const startClaim = () => setView('form');
 
   const handleClaimSubmit = async (data: ClaimFormData) => {
-    setLoading(true);
-    // Simulate API call (will integrate with Firebase later)
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setLoading(false);
-    setClaimData(data);
-    setView('success');
+    if (!linkId) {
+      toast.error('Invalid claim link');
+      return;
+    }
+
+    try {
+      await submitClaim(linkId, data);
+      setClaimData(data);
+      setView('success');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to submit claim');
+    }
   };
 
   const resetFlow = () => {
@@ -78,7 +86,7 @@ export const ClaimPage: React.FC = () => {
               <h2 className="text-3xl font-bold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">
                 Claim Details
               </h2>
-              <ClaimForm onSubmit={handleClaimSubmit} isLoading={loading} />
+              <ClaimForm onSubmit={handleClaimSubmit} isLoading={isLoading} />
               <button 
                 onClick={() => setView('landing')}
                 className="w-full mt-6 text-gray-500 hover:text-white transition-colors text-sm"

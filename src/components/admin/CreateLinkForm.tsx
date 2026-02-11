@@ -2,24 +2,31 @@ import React, { useState } from 'react';
 import { AnimatedButton } from '../common/AnimatedButton';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { useCreateClaimLink } from '../../hooks/useCreateClaimLink';
+import { useAuth } from '../../contexts/AuthContext';
 
 export const CreateLinkForm: React.FC = () => {
   const [rewardName, setRewardName] = useState('');
   const [generatedLink, setGeneratedLink] = useState('');
-  const [loading, setLoading] = useState(false);
+  const { createLink, isLoading } = useCreateClaimLink();
+  const { user } = useAuth();
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-
-    // Simulate link generation (will integrate with Firebase later)
-    await new Promise(resolve => setTimeout(resolve, 1000));
     
-    const linkId = Math.random().toString(36).substring(2, 15);
-    const link = `${window.location.origin}/claim/${linkId}`;
-    setGeneratedLink(link);
-    setLoading(false);
-    toast.success('Link generated successfully!');
+    if (!user?.email) {
+      toast.error('You must be logged in to create a link');
+      return;
+    }
+
+    try {
+      const link = await createLink(rewardName, user.email);
+      setGeneratedLink(link);
+      toast.success('Link generated successfully!');
+      setRewardName(''); // Clear form
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to generate link');
+    }
   };
 
   const copyToClipboard = () => {
@@ -56,7 +63,7 @@ export const CreateLinkForm: React.FC = () => {
         <AnimatedButton
           type="submit"
           text="Generate Link"
-          loading={loading}
+          loading={isLoading}
           className="w-full"
         />
       </form>
