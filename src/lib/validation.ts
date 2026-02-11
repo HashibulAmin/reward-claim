@@ -24,7 +24,10 @@ export const claimFormSchema = z.object({
         }),
 
     pickupTimeSlot: z.string()
-        .min(1, { message: "Please select a time slot" }),
+        .optional()
+        .refine((val) => val && val.length > 0, {
+            message: "Please select a pickup time"
+        }),
 });
 
 export type ClaimFormData = z.infer<typeof claimFormSchema>;
