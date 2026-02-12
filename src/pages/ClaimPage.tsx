@@ -16,7 +16,7 @@ export const ClaimPage: React.FC = () => {
   const { linkId } = useParams<{ linkId?: string }>();
   const [view, setView] = useState<'landing' | 'form' | 'success'>('landing');
   const [claimData, setClaimData] = useState<ClaimFormData | null>(null);
-  const { submitClaim, isLoading, error } = useClaimSubmit();
+  const { submitClaim, isLoading } = useClaimSubmit();
 
   const startClaim = () => setView('form');
 
@@ -105,7 +105,7 @@ export const ClaimPage: React.FC = () => {
             pickupDetails={{
               location: claimData.pickupLocation,
               date: claimData.pickupDate,
-              timeSlotId: claimData.pickupTimeSlot
+              timeSlotId: claimData.pickupTimeSlot || ''
             }}
             onClose={resetFlow}
           />
