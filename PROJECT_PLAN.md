@@ -1,4 +1,4 @@
-# Reward Claim Web App - Google Antigravity Agent Plan
+# Reward Claim Web App
 
 ## Project Overview
 A delightful reward claiming web app with animated graphics (gift, balloons, kitty), user data collection, Firebase integration, and admin dashboard. Built using Google Antigravity's multi-agent orchestration for parallel development.
