@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useClaims } from '../../hooks/useClaims';
 import { useAuth } from '../../contexts/AuthContext';
 import { TIME_SLOTS } from '../../utils/timeSlots';
+import { Search, Phone } from 'lucide-react';
 
 // Helper function to get readable time slot label
 const getTimeSlotLabel = (timeSlotId: string): string => {
@@ -13,6 +14,16 @@ const getTimeSlotLabel = (timeSlotId: string): string => {
 export const ClaimsTable: React.FC = () => {
   const { user } = useAuth();
   const { claims, isLoading, error } = useClaims(user?.email);
+  const [rewardFilter, setRewardFilter] = useState('');
+  const [phoneFilter, setPhoneFilter] = useState('');
+
+  const filteredClaims = useMemo(() => {
+    return claims.filter((claim) => {
+      const matchesReward = (claim.rewardName || '').toLowerCase().includes(rewardFilter.toLowerCase());
+      const matchesPhone = (claim.pickupNumber || '').includes(phoneFilter);
+      return matchesReward && matchesPhone;
+    });
+  }, [claims, rewardFilter, phoneFilter]);
 
   if (isLoading) {
     return (
@@ -55,13 +66,38 @@ export const ClaimsTable: React.FC = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >
-      <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">
-        Claimed Rewards
-      </h2>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">
+          Claimed Rewards
+        </h2>
 
-      {claims.length === 0 ? (
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Filter by Reward..."
+              value={rewardFilter}
+              onChange={(e) => setRewardFilter(e.target.value)}
+              className="pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 w-full sm:w-48"
+            />
+          </div>
+          <div className="relative">
+            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Filter by Phone..."
+              value={phoneFilter}
+              onChange={(e) => setPhoneFilter(e.target.value)}
+              className="pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 w-full sm:w-48"
+            />
+          </div>
+        </div>
+      </div>
+
+      {filteredClaims.length === 0 ? (
         <div className="text-center py-12 text-gray-400">
-          No claims yet
+          {claims.length === 0 ? 'No claims yet' : 'No claims match your filters'}
         </div>
       ) : (
         <>
@@ -80,7 +116,7 @@ export const ClaimsTable: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {claims.map((claim) => (
+                {filteredClaims.map((claim) => (
                    <tr key={claim.claimId} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                      <td className="py-3 px-4 text-white font-medium">{claim.rewardName}</td>
                      <td className="py-3 px-4 text-gray-300">{claim.userName}</td>
@@ -99,7 +135,7 @@ export const ClaimsTable: React.FC = () => {
 
           {/* Mobile Card View */}
           <div className="md:hidden space-y-4">
-            {claims.map((claim) => (
+            {filteredClaims.map((claim) => (
               <div key={claim.claimId} className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-2">
                 <div className="flex justify-between items-start">
                   <h3 className="font-semibold text-white">{claim.userName}</h3>
