@@ -70,8 +70,9 @@ export const ClaimsTable: React.FC = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-white/10">
-                  <th className="text-left py-3 px-4 text-gray-400 font-medium">Name</th>
-                  <th className="text-left py-3 px-4 text-gray-400 font-medium">Phone</th>
+                   <th className="text-left py-3 px-4 text-gray-400 font-medium">Reward</th>
+                   <th className="text-left py-3 px-4 text-gray-400 font-medium">Name</th>
+                   <th className="text-left py-3 px-4 text-gray-400 font-medium">Phone</th>
                   <th className="text-left py-3 px-4 text-gray-400 font-medium">Location</th>
                   <th className="text-left py-3 px-4 text-gray-400 font-medium">Pickup Date</th>
                   <th className="text-left py-3 px-4 text-gray-400 font-medium">Time Slot</th>
@@ -80,9 +81,10 @@ export const ClaimsTable: React.FC = () => {
               </thead>
               <tbody>
                 {claims.map((claim) => (
-                  <tr key={claim.claimId} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <td className="py-3 px-4 text-white">{claim.userName}</td>
-                    <td className="py-3 px-4 text-gray-300">{claim.pickupNumber}</td>
+                   <tr key={claim.claimId} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                     <td className="py-3 px-4 text-white font-medium">{claim.rewardName}</td>
+                     <td className="py-3 px-4 text-gray-300">{claim.userName}</td>
+                     <td className="py-3 px-4 text-gray-300">{claim.pickupNumber}</td>
                     <td className="py-3 px-4 text-gray-300">{claim.pickupLocation}</td>
                     <td className="py-3 px-4 text-gray-300">{claim.pickupDate}</td>
                     <td className="py-3 px-4 text-gray-300">{getTimeSlotLabel(claim.pickupTimeSlot)}</td>
@@ -105,8 +107,9 @@ export const ClaimsTable: React.FC = () => {
                     {claim.claimedAt?.toDate ? claim.claimedAt.toDate().toLocaleDateString() : 'N/A'}
                   </span>
                 </div>
-                <div className="text-sm text-gray-300 space-y-1">
-                  <p><span className="text-gray-400">Phone:</span> {claim.pickupNumber}</p>
+                 <div className="text-sm text-gray-300 space-y-1">
+                   <p><span className="text-gray-400 font-medium">Reward:</span> <span className="text-purple-400">{claim.rewardName}</span></p>
+                   <p><span className="text-gray-400">Phone:</span> {claim.pickupNumber}</p>
                   <p><span className="text-gray-400">Location:</span> {claim.pickupLocation}</p>
                   <p><span className="text-gray-400">Date:</span> {claim.pickupDate}</p>
                   <p><span className="text-gray-400">Time:</span> {getTimeSlotLabel(claim.pickupTimeSlot)}</p>

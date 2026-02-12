@@ -28,4 +28,5 @@ export interface Claim {
     pickupTimeSlot: string;
     claimedAt: Timestamp;
     status: ClaimStatus;
+    rewardName?: string;
 }

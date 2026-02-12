@@ -26,34 +26,53 @@ export const useClaims = (ownerEmail: string | null | undefined): UseClaimsResul
         setError(null);
 
         const claimsRef = collection(db, 'claims');
-        // Requires composite index: ownerEmail ASC, claimedAt DESC
-        const q = query(
-            claimsRef,
-            where('ownerEmail', '==', ownerEmail),
-            orderBy('claimedAt', 'desc')
-        );
+        const linksRef = collection(db, 'claimLinks');
 
-        const unsubscribe = onSnapshot(q,
-            (snapshot: QuerySnapshot<DocumentData>) => {
-                const newClaims: Claim[] = [];
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    newClaims.push({
-                        claimId: doc.id,
-                        ...data,
-                        // Ensure timestamp handling is safe if it's not yet fully written (latency compensation)
-                        claimedAt: data.claimedAt as Timestamp
-                    } as Claim);
-                });
-                setClaims(newClaims);
-                setIsLoading(false);
-            },
-            (err: any) => {
-                console.error('Error fetching claims:', err);
-                setError('Failed to load claims. Permission denied?');
-                setIsLoading(false);
-            }
-        );
+        // 1. First fetch claimLinks to get titles
+        const linksQuery = query(linksRef, where('createdBy', '==', ownerEmail));
+
+        const unsubscribe = onSnapshot(linksQuery, (linksSnapshot) => {
+            const linksMap: Record<string, string> = {};
+            linksSnapshot.forEach(doc => {
+                const data = doc.data();
+                linksMap[doc.id] = data.title || 'Untitled Reward';
+            });
+
+            // 2. Then set up listener for claims
+            const claimsQuery = query(
+                claimsRef,
+                where('ownerEmail', '==', ownerEmail),
+                orderBy('claimedAt', 'desc')
+            );
+
+            const unsubscribeClaims = onSnapshot(claimsQuery,
+                (snapshot: QuerySnapshot<DocumentData>) => {
+                    const newClaims: Claim[] = [];
+                    snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        newClaims.push({
+                            claimId: doc.id,
+                            ...data,
+                            rewardName: linksMap[data.linkId] || 'Unknown Reward',
+                            claimedAt: data.claimedAt as Timestamp
+                        } as Claim);
+                    });
+                    setClaims(newClaims);
+                    setIsLoading(false);
+                },
+                (err: any) => {
+                    console.error('Error fetching claims:', err);
+                    setError('Failed to load claims. Permission denied?');
+                    setIsLoading(false);
+                }
+            );
+
+            return () => unsubscribeClaims();
+        }, (err) => {
+            console.error('Error fetching links:', err);
+            setError('Failed to load reward names.');
+            setIsLoading(false);
+        });
 
         return () => unsubscribe();
     }, [ownerEmail]);
