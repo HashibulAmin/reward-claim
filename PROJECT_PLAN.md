@@ -1,11 +1,7 @@
 # Reward Claim Web App
 
 ## Project Overview
-A delightful reward claiming web app with animated graphics (gift, balloons, kitty), user data collection, Firebase integration, and admin dashboard. Built using Google Antigravity's multi-agent orchestration for parallel development.
-
-**Platform**: Google Antigravity IDE (Agent-First Development)  
-**Primary AI Model**: Gemini 3 Pro (with Deep Think for complex tasks)  
-**Alternative Models**: Claude Sonnet 4.5, GPT-OSS-120B
+A delightful reward claiming web app with animated graphics (gift, balloons, kitty), user data collection, Firebase integration, and admin dashboard.
 
 ---
 
@@ -24,11 +20,9 @@ A delightful reward claiming web app with animated graphics (gift, balloons, kit
 
 ---
 
-## Antigravity-Specific Approach
-
 ### Agent Orchestration Strategy
 
-Google Antigravity allows you to run **multiple agents in parallel** via the Manager View. For this project, we'll use:
+For this project, we'll use:
 
 1. **Setup Agent** - Project initialization, dependencies, config
 2. **Animation Agent** - All animation components (Gift, Balloons, Kitty, Button, Confetti)
@@ -688,12 +682,9 @@ Optional enhancements:
 
 ## Support Resources
 
-- **Antigravity Docs**: https://codelabs.developers.google.com/getting-started-google-antigravity
 - **Firebase Docs**: https://firebase.google.com/docs
 - **React Router**: https://reactrouter.com
 - **Framer Motion**: https://www.framer.com/motion
 - **Tailwind CSS**: https://tailwindcss.com
 
 ---
-
-**Built with Google Antigravity - Experience Liftoff! 🚀**
